@@ -1,14 +1,4 @@
-const { performance } = require("perf_hooks");
-
-const time = () => {
-  const ti = performance.now();
-  return () => {
-    const te = performance.now();
-    return te - ti;
-  };
-};
-
-const makeArray = n => new Array(n).fill(0).map((_, i) => i);
+const { time, makeArray } = require("./utils");
 
 const linearSearch = (arr, needle) => {
   for (let i = 0; i < arr.length; i++) {
@@ -32,10 +22,13 @@ const binarySearch = (arr, needle) => {
       min = mid;
     }
   }
+  return false;
 };
 
-const longArray = makeArray(1e7);
-const t = time();
-binarySearch(longArray, -1);
-const e = t();
-console.log("Time:", e, "ms");
+const longArray = makeArray(1000);
+
+const linTime = time(() => linearSearch(longArray, -1));
+console.log("Linear Search:", linTime, "ms");
+
+const bsTime = time(() => binarySearch(longArray, -1));
+console.log("Binary Search:", bsTime, "ms");
