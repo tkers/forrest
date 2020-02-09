@@ -17,12 +17,22 @@ const initCanvas = (canvas, draw) => {
 };
 
 class Thing {
-  constructor(x, y, size = 10) {
+  constructor(x, y, width = 10, height = 10) {
     this.x = x;
     this.y = y;
-    this.size = size;
+    this.width = width;
+    this.height = height;
     this.velocity = 5 + 15 * Math.random();
     this.direction = 360 * Math.random();
+  }
+
+  collides(that) {
+    return (
+      this.x < that.x + that.width &&
+      that.x < this.x + this.width &&
+      this.y < that.y + that.height &&
+      that.y < this.y + this.height
+    );
   }
 
   update(dt) {
@@ -31,11 +41,11 @@ class Thing {
   }
 
   draw(ctx) {
-    ctx.fillRect(this.x, this.y, this.size, this.size);
+    ctx.fillRect(this.x, this.y, this.width, this.height);
   }
 }
 
-const things = new Array(10)
+const things = new Array(50)
   .fill(0)
   .map(() => new Thing(700 * Math.random(), 400 * Math.random()));
 
@@ -43,15 +53,20 @@ let t = 0;
 const draw = (ctx, dt) => {
   t += dt;
 
-  ctx.fillStyle = "#000000";
+  let checks = 0;
   things.forEach(thing => {
+    const intersect = things.some(other => {
+      checks++;
+      return thing !== other && thing.collides(other);
+    });
+    ctx.fillStyle = intersect ? "#FF0000" : "#000000";
     thing.update(dt);
     thing.draw(ctx);
   });
 
-  ctx.font = "22px sans-serif";
-  ctx.fillStyle = "#FF0000";
-  ctx.fillText(`${things.length} cubes`, 8, 16);
+  ctx.font = "16px sans-serif";
+  ctx.fillStyle = "#0000AA";
+  ctx.fillText(`${things.length} cubes • ${checks} checks`, 10, 28);
 };
 
 document.addEventListener("DOMContentLoaded", () => {
